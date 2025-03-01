@@ -12,9 +12,8 @@ ses = boto3.client('ses', region_name='us-east-2')  # Ensure this matches your S
 
 # Configuration
 RSS_FEED_URLS = [
-    "https://rss.app/feeds/hRCR7ZIFKjjZK5kc.xml"  
-    "https://rss.app/feeds/KpbN8QOMNimyOR71.xml",
-    "https://rss.app/feeds/DALdJLA7YwP1Jag8.xml"
+    "https://rss.app/feeds/YOUR_FEED_URL_1",
+    "https://rss.app/feeds/YOUR_FEED_URL_2"
 ]  # Add more feeds as needed
 S3_BUCKET = "hs-my-jobsearch-bucket"
 S3_FILE_NAME = f"jobs_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
