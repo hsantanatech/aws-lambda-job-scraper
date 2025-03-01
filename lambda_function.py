@@ -12,14 +12,30 @@ ses = boto3.client('ses', region_name='us-east-2')  # Ensure this matches your S
 
 # Configuration
 RSS_FEED_URLS = [
-    "https://rss.app/feeds/hRCR7ZIFKjjZK5kc.xml"  
-    "https://rss.app/feeds/KpbN8QOMNimyOR71.xml",
-    "https://rss.app/feeds/DALdJLA7YwP1Jag8.xml"
+    "https://rss.app/feeds/CLmqdD26b4Nxs8Mz.xml"
 ]  # Add more feeds as needed
 S3_BUCKET = "hs-my-jobsearch-bucket"
 S3_FILE_NAME = f"jobs_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
 EMAIL_SENDER = "hsantana@renacentis.org"  # Must be verified in AWS SES
 EMAIL_RECIPIENT = "hsantana@renacentis.org"  # Change if needed
+
+# Initialize DynamoDB client
+dynamodb = boto3.resource('dynamodb', region_name='us-east-2')
+table = dynamodb.Table('JobListings')
+
+def is_job_new(job_link):  # Check if job is new
+    """Check if a job already exists in DynamoDB."""
+    response = table.get_item(Key={'job_link': job_link})
+    return 'Item' not in response  # Returns True if job is new
+
+def save_job_to_dynamodb(job_link, title, pub_date, source):
+    """Store new job in DynamoDB to prevent duplicates."""
+    table.put_item(Item={
+        'job_link': job_link,
+        'title': title,
+        'pub_date': pub_date,
+        'source': source
+    })
 
 def fetch_rss_jobs():
     """Fetch job listings from multiple RSS feeds."""
@@ -34,12 +50,13 @@ def fetch_rss_jobs():
         root = ET.fromstring(response.content)
 
         for item in root.findall(".//item"):
-            title = item.find("title").text if item.find("title") is not None else "No Title"
-            link = item.find("link").text if item.find("link") is not None else "No Link"
-            pub_date = item.find("pubDate").text if item.find("pubDate") is not None else "No Date"
-            
-            # Include feed source in each job entry
-            jobs.append([title, link, pub_date, feed_url])  
+            title = item.find("title").text or "No Title"
+            link = item.find("link").text or "No Link"
+            pub_date = item.find("pubDate").text or "No Date"
+
+            if is_job_new(link):  # ✅ Check if job is new
+                jobs.append([title, link, pub_date, feed_url])
+                save_job_to_dynamodb(link, title, pub_date, feed_url)  # ✅ Store new job  
 
     return jobs
 
