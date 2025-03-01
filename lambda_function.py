@@ -18,8 +18,8 @@ RSS_FEED_URLS = [
 ]  # Add more feeds as needed
 S3_BUCKET = "hs-my-jobsearch-bucket"
 S3_FILE_NAME = f"jobs_{datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}.csv"
-EMAIL_SENDER = "hsantana@renacentis.org"  # Must be verified in AWS SES
-EMAIL_RECIPIENT = "hsantana@renacentis.org"  # Change if needed
+EMAIL_SENDER = "your-email@example.com"  # Must be verified in AWS SES
+EMAIL_RECIPIENT = "your-email@example.com"  # Change if needed
 
 def fetch_rss_jobs():
     """Fetch job listings from multiple RSS feeds."""
