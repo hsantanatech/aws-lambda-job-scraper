@@ -39,3 +39,25 @@ resource "aws_iam_role_policy_attachment" "lambda_ses_policy_attachment" {
   role       = aws_iam_role.lambda_exec.name
   policy_arn = aws_iam_policy.lambda_ses_policy.arn
 }
+resource "aws_iam_policy" "lambda_dynamodb_policy" {
+  name        = "lambda_dynamodb_policy"
+  description = "Policy for Lambda to access DynamoDB for the JobListings table"
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect   = "Allow",
+        Action   = [
+          "dynamodb:GetItem",
+          "dynamodb:PutItem"
+        ],
+        Resource = "arn:aws:dynamodb:${var.region}:${var.account_id}:table/JobListings"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamodb_policy_attachment" {
+  role       = aws_iam_role.lambda_exec.name
+  policy_arn = aws_iam_policy.lambda_dynamodb_policy.arn
+}
