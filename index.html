@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AWS Cloud Engineer Jobs</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
+        h2 { color: #333; }
+        #jobs-list { list-style-type: none; padding: 0; }
+        li { margin: 10px 0; }
+        a { text-decoration: none; color: #0073e6; }
+    </style>
+</head>
+<body>
+
+    <h2>🚀 AWS Cloud Engineer Jobs</h2>
+    <ul id="jobs-list">Loading jobs...</ul>
+
+    <script>
+        async function fetchJobs() {
+            try {
+                const response = await fetch("https://your-api-gateway-endpoint.com/jobs/rss");
+                const xmlText = await response.text();
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+                let jobList = "";
+                const items = xmlDoc.getElementsByTagName("item");
+
+                for (let i = 0; i < items.length; i++) {
+                    let title = items[i].getElementsByTagName("title")[0].textContent;
+                    let link = items[i].getElementsByTagName("link")[0].textContent;
+                    jobList += `<li><a href="${link}" target="_blank">${title}</a></li>`;
+                }
+
+                document.getElementById("jobs-list").innerHTML = jobList || "<li>No jobs found</li>";
+
+            } catch (error) {
+                document.getElementById("jobs-list").innerHTML = "<li>Failed to load jobs</li>";
+                console.error("Error fetching jobs:", error);
+            }
+        }
+
+        fetchJobs();
+    </script>
+
+</body>
+</html>
