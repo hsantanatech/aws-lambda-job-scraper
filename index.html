@@ -3,47 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AWS Cloud Engineer Jobs</title>
+    <title>Remote Job Listings</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        h2 { color: #333; }
-        #jobs-list { list-style-type: none; padding: 0; }
-        li { margin: 10px 0; }
-        a { text-decoration: none; color: #0073e6; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        .job-card {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+            background: #fff;
+        }
+        .job-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+        .description {
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .apply-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+        .apply-link:hover {
+            background-color: #0056b3;
+        }
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #777;
+        }
     </style>
-</head>
-<body>
-
-    <h2>🚀 AWS Cloud Engineer Jobs</h2>
-    <ul id="jobs-list">Loading jobs...</ul>
-
     <script>
         async function fetchJobs() {
             try {
-                const response = await fetch("https://your-api-gateway-endpoint.com/jobs/rss");
-                const xmlText = await response.text();
-                const parser = new DOMParser();
-                const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+                const apiUrl = "https://qxdjdnp9wd.execute-api.us-east-2.amazonaws.com/default/jobs";
+                const response = await fetch(apiUrl);
+                const text = await response.text(); // Get raw XML response
 
-                let jobList = "";
+                // Convert XML to JSON
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(text, "text/xml");
                 const items = xmlDoc.getElementsByTagName("item");
 
+                const jobList = document.getElementById("job-list");
+                jobList.innerHTML = ""; // Clear previous data
+
+                if (items.length === 0) {
+                    jobList.innerHTML = "<p class='loading'>No job listings available at the moment.</p>";
+                    return;
+                }
+
+                // Loop through each <item> in the XML
                 for (let i = 0; i < items.length; i++) {
                     let title = items[i].getElementsByTagName("title")[0].textContent;
                     let link = items[i].getElementsByTagName("link")[0].textContent;
-                    jobList += `<li><a href="${link}" target="_blank">${title}</a></li>`;
+                    let description = items[i].getElementsByTagName("description")[0].textContent;
+
+                    let jobItem = document.createElement("div");
+                    jobItem.classList.add("job-card");
+                    jobItem.innerHTML = `
+                        <div class="job-title">${title}</div>
+                        <p class="description">${description}</p>
+                        <a class="apply-link" href="${link}" target="_blank">Apply Now</a>
+                    `;
+                    jobList.appendChild(jobItem);
                 }
-
-                document.getElementById("jobs-list").innerHTML = jobList || "<li>No jobs found</li>";
-
             } catch (error) {
-                document.getElementById("jobs-list").innerHTML = "<li>Failed to load jobs</li>";
-                console.error("Error fetching jobs:", error);
+                console.error("Error fetching job listings:", error);
+                document.getElementById("job-list").innerHTML = "<p class='loading'>Failed to load job listings. Please try again later.</p>";
             }
         }
 
-        fetchJobs();
+        window.onload = fetchJobs;
     </script>
-
+</head>
+<body>
+    <h1>Remote Job Listings</h1>
+    <div class="container">
+        <div id="job-list" class="loading">Loading jobs...</div>
+    </div>
 </body>
 </html>
