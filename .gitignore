@@ -4,3 +4,22 @@ terraform.tfstate
 terraform.tfstate.backup
 *.tfvars
 *.tfstate.d/
+
+# Python
+__pycache__/
+*.pyc
+
+# Build artifacts
+*.zip
+
+# Virtual environments
+venv/
+
+# Terraform
+.terraform/
+terraform.tfstate
+terraform.tfstate.backup
+
+# IDEs
+.vscode/
+.idea/
